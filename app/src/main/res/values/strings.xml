@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">WeatherApp</string>
+    <string name="app_name">Weather application</string>
+    <string name="ButtonText">Load data</string>
 </resources>

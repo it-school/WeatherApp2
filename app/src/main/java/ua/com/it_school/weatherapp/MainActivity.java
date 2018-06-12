@@ -28,7 +28,6 @@ import java.nio.charset.Charset;
 import org.json.JSONArray;
 
 
-
 public class MainActivity extends AppCompatActivity {
 
     ImageView imageView;
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         jsonIn = "";//"{\"coord\":{\"lon\":30.73,\"lat\":46.48},\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"ясно\",\"icon\":\"01d\"}],\"base\":\"stations\",\"main\":{\"temp\":296.15,\"pressure\":1020,\"humidity\":33,\"temp_min\":296.15,\"temp_max\":296.15},\"visibility\":10000,\"wind\":{\"speed\":3,\"deg\":150},\"clouds\":{\"all\":0},\"dt\":1528381800,\"sys\":{\"type\":1,\"id\":7366,\"message\":0.0021,\"country\":\"UA\",\"sunrise\":1528337103,\"sunset\":1528393643},\"id\":698740,\"name\":\"Odessa\",\"cod\":200}";
         text = "";
 
-
         WeatherGetter wg = new WeatherGetter();
         wg.execute();
     }
@@ -73,10 +71,10 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             String temp = "";
-            //JSONObject jsotemp = new JSONObject();
+            JSONObject jsontemp = new JSONObject(json, new String[] {"main"}) ;
 
-    //                " ("+(Double.parseDouble(json.getString ("temp").toString())-273)+")"
-            ((TextView)findViewById(R.id.textView)).setText(json.getString ("name").toString()+" ("+temp+")");
+            temp = "123 ("+(Double.parseDouble(jsontemp.getString ("temp"))-273.15)+")";
+            ((TextView)findViewById(R.id.textView)).setText(json.getString ("name")+" ("+temp+")");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -103,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    class WeatherGetter extends AsyncTask<Void, Void, Void> {
+    class WeatherGetter extends AsyncTask<Void, Void, Void>
+    {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -122,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
 
             String url="http://api.openweathermap.org/data/2.5/weather?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
+            String urlForecast="api.openweathermap.org/data/2.5/forecast?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
 
             InputStream is = null;
             try {

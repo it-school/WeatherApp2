@@ -50,11 +50,12 @@
         <Button
             android:id="@+id/button"
             android:layout_width="match_parent"
-            android:layout_height="85dp"
+            android:layout_height="75dp"
             android:onClick="btnClick"
-            android:text="Button"
+            android:visibility="visible"
             tools:layout_editor_absoluteX="90dp"
-            tools:layout_editor_absoluteY="334dp" />
+            tools:layout_editor_absoluteY="334dp"
+            tools:text="@string/ButtonText" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
