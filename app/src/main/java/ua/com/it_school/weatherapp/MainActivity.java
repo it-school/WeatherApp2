@@ -1,6 +1,9 @@
 package ua.com.it_school.weatherapp;
 
+import android.content.Context;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.nodes.Document;
@@ -35,9 +39,13 @@ public class MainActivity extends AppCompatActivity {
     TextView textView;
     WebView webView;
     Resources res;
-
+    Main main;
+    boolean isDataLoaded;
+    boolean isConnected;
+    String currWeatherURL;
     Document page = null;
     private String FLAG;
+    WeatherGetter wg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,42 +57,60 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
         jsonIn = "";//"{\"coord\":{\"lon\":30.73,\"lat\":46.48},\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"ясно\",\"icon\":\"01d\"}],\"base\":\"stations\",\"main\":{\"temp\":296.15,\"pressure\":1020,\"humidity\":33,\"temp_min\":296.15,\"temp_max\":296.15},\"visibility\":10000,\"wind\":{\"speed\":3,\"deg\":150},\"clouds\":{\"all\":0},\"dt\":1528381800,\"sys\":{\"type\":1,\"id\":7366,\"message\":0.0021,\"country\":\"UA\",\"sunrise\":1528337103,\"sunset\":1528393643},\"id\":698740,\"name\":\"Odessa\",\"cod\":200}";
         text = "";
-
-        WeatherGetter wg = new WeatherGetter();
+        isDataLoaded = false;
+        isConnected = true;
+        currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
+        wg = new WeatherGetter();
         wg.execute();
     }
 
-    public void RefreshWeather()
-    {
+    public void RefreshWeather() {
 
     }
 
-    public void ParseWeather()
-    {
+    public void ParseWeather() {
+        boolean cont = false;
         JSONObject json = null;
         try {
             json = new JSONObject(jsonIn);
+            cont = true;
         } catch (JSONException e) {
             Log.e("log_tag", "Error parsing data " + e.toString());
         }
 
-        try {
-            String temp1 = "";
-            JSONObject jsontemp = (JSONObject) json.get("main") ;
+        if (cont)
 
-            temp1 = "" + (jsontemp.getDouble("temp")-273.15) ;
+            try {
+                String temp1 = "";
+                JSONObject jsonMain = (JSONObject) json.get("main");
+                double temp = jsonMain.getDouble("temp") - 273.15;
+                int pressure = jsonMain.getInt("pressure");
+                int humidity = jsonMain.getInt("humidity");
+
+                SimpleDateFormat sm = new SimpleDateFormat("d.M.Y H:m");  // https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
+                sm.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+                Date date = new Date(json.getLong("dt") * 1000);
+
+                JSONArray jsonWeather = (JSONArray) json.get("weather");
+                String description = jsonWeather.getJSONObject(0).getString("description");
+
+                JSONObject jsonWind = (JSONObject) json.get("wind");
+                int speed = jsonWind.getInt("speed");
+                int deg = jsonWind.getInt("deg");
+
+                JSONObject jsonClouds = (JSONObject) json.get("clouds");
+                int clouds = jsonClouds.getInt("all");
+
+                main = new Main(temp, pressure, humidity, date, description, speed, deg, clouds);
+                isDataLoaded = true;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                //drawWeather();
+            }
+        //   ((TextView)findViewById(R.id.textView)).setText(main.toString());
 
 
 
-            SimpleDateFormat sm = new SimpleDateFormat("d.M.Y H:m");  // https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
-            sm.setTimeZone(TimeZone.getTimeZone("GMT+3"));
-            Date date = new Date(json.getLong("dt")*1000);
-
-
-            ((TextView)findViewById(R.id.textView)).setText(json.getString ("name")+" ("+sm.format(date) + ": " + temp1+")");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
 
         /*
@@ -103,18 +129,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void btnClick(View view) {
-        imageView.setImageResource(R.drawable.sun);
+//        wg.ConnectAndGetData(currWeatherURL);
         ParseWeather();
+        drawWeather();
+
+    }
+
+    public void drawWeather() {
+
+        if (isConnected) {
+            if (main.getClouds() < 5) {
+                imageView.setImageResource(R.drawable.transparent);
+            } else if (main.getClouds() < 25) {
+                imageView.setImageResource(R.drawable.cloud1);
+            } else if (main.getClouds() < 50) {
+                imageView.setImageResource(R.drawable.cloud2);
+            } else if (main.getClouds() < 75) {
+                imageView.setImageResource(R.drawable.cloud3);
+            } else
+                imageView.setImageResource(R.drawable.cloud4);
+
+            imageView.setBackgroundResource(R.drawable.sun);
+
+        } else
+            imageView.setImageResource(R.drawable.nodata);
     }
 
 
     class WeatherGetter extends AsyncTask<Void, Void, Void>
     {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
         private String readAll(Reader rd) throws IOException {
             StringBuilder sb = new StringBuilder();
             int cp;
@@ -124,33 +167,58 @@ public class MainActivity extends AppCompatActivity {
             return sb.toString();
         }
 
+        public void ConnectAndGetData(String url)
+        {
+
+            //String url = "http://api.openweathermap.org/data/2.5/weather?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
+            //String urlForecast = "api.openweathermap.org/data/2.5/forecast?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
+
+            InputStream is = null;
+
+
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
+            if(netInfo.isConnected())
+
+            {
+                try {
+                    is = new URL(url).openStream();
+                    try {
+                        BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+                        try {
+                            jsonIn = readAll(rd);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } finally {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            else
+
+            {
+                isConnected = false;
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
 
-            String url="http://api.openweathermap.org/data/2.5/weather?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
-            String urlForecast="api.openweathermap.org/data/2.5/forecast?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
-
-            InputStream is = null;
-            try {
-                is = new URL(url).openStream();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-                try {
-                    jsonIn = readAll(rd);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
+            ConnectAndGetData(currWeatherURL);
             /*
             url = "http://study.cc.ua";
             try {
