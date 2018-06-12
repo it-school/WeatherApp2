@@ -1,20 +1,18 @@
 package ua.com.it_school.weatherapp;
 
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.os.AsyncTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.BufferedReader;
@@ -24,8 +22,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
-
-import org.json.JSONArray;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -74,7 +73,15 @@ public class MainActivity extends AppCompatActivity {
             JSONObject jsontemp = (JSONObject) json.get("main") ;
 
             temp1 = "" + (jsontemp.getDouble("temp")-273.15) ;
-            ((TextView)findViewById(R.id.textView)).setText(json.getString ("name")+" ("+temp1+")");
+
+
+
+            SimpleDateFormat sm = new SimpleDateFormat("d.M.Y H:m");  // https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
+            sm.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+            Date date = new Date(json.getLong("dt")*1000);
+
+
+            ((TextView)findViewById(R.id.textView)).setText(json.getString ("name")+" ("+sm.format(date) + ": " + temp1+")");
         } catch (JSONException e) {
             e.printStackTrace();
         }
