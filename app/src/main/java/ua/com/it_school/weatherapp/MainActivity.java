@@ -70,11 +70,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            String temp = "";
-            JSONObject jsontemp = new JSONObject(json, new String[] {"main"}) ;
+            String temp1 = "";
+            JSONObject jsontemp = (JSONObject) json.get("main") ;
 
-            temp = "123 ("+(Double.parseDouble(jsontemp.getString ("temp"))-273.15)+")";
-            ((TextView)findViewById(R.id.textView)).setText(json.getString ("name")+" ("+temp+")");
+            temp1 = "" + (jsontemp.getDouble("temp")-273.15) ;
+            ((TextView)findViewById(R.id.textView)).setText(json.getString ("name")+" ("+temp1+")");
         } catch (JSONException e) {
             e.printStackTrace();
         }
