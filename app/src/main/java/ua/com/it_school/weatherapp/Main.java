@@ -11,8 +11,9 @@ public class Main {
     private int speed;
     private int deg;
     private int clouds;
+    private String name;
 
-    public Main(double temp, int pressure, int humidity, Date date, String description, int speed, int deg, int clouds) {
+    public Main(double temp, int pressure, int humidity, Date date, String description, int speed, int deg, int clouds, String city) {
         this.temp = temp;
         this.pressure = pressure;
         this.humidity = humidity;
@@ -21,6 +22,7 @@ public class Main {
         this.speed = speed;
         this.deg = deg;
         this.clouds = clouds;
+        this.name = city;
     }
 
     public double getTemp() {
@@ -55,7 +57,7 @@ public class Main {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        return sb.append("Date: " + date).append("description: " +  description).append("temp: " + temp).
+        return sb.append("City: " + name).append(", date: " + date).append("description: " +  description).append("temp: " + temp).
                 append("\npressure: " + pressure).append("humidity: " + humidity).append("wind: " + speed + "("+ deg+")").toString();
     }
 
@@ -89,5 +91,13 @@ public class Main {
 
     public void setClouds(int clouds) {
         this.clouds = clouds;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

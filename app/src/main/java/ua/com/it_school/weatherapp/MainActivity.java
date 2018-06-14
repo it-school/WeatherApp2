@@ -46,8 +46,6 @@ public class MainActivity extends AppCompatActivity {
     String currWeatherURL;
     Document page = null;
     private String FLAG;
-    WeatherGetter wg;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +59,10 @@ public class MainActivity extends AppCompatActivity {
         text = "";
         isDataLoaded = false;
         isConnected = true;
-        currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
+     //   currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
+        currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?lat="+Coordinates.latitude+"&lon="+Coordinates.longitude+"&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
+// repair static properties
+        WeatherGetter wg;
         wg = new WeatherGetter();
         wg.execute();
     }
@@ -103,17 +104,26 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject jsonClouds = (JSONObject) json.get("clouds");
                 int clouds = jsonClouds.getInt("all");
 
-                main = new Main(temp, pressure, humidity, date, description, speed, deg, clouds);
+                String name = json.getString("name");
+
+                main = new Main(temp, pressure, humidity, date, description, speed, deg, clouds, name);
                 isDataLoaded = true;
             } catch (JSONException e) {
                 e.printStackTrace();
                 //drawWeather();
             }
-        //   ((TextView)findViewById(R.id.textView)).setText(main.toString());
+            textView.setText(main.toString());
    }
 
-    public void btnClick(View view) {
-//        wg.ConnectAndGetData(currWeatherURL);
+    public void btnLoadData(View view) {
+
+        currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?lat="+Coordinates.latitude+"&lon="+Coordinates.longitude+"&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
+
+        WeatherGetter wg;
+        wg = new WeatherGetter();
+        //wg.ConnectAndGetData(currWeatherURL);
+        wg.execute();
+        wg.cancel(true);
         ParseWeather();
         drawWeather();
     }
@@ -167,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
             //String urlForecast = "api.openweathermap.org/data/2.5/forecast?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
 
             InputStream is = null;
-
 
             ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -237,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             //textView.setText("\n------------------\n" + jsonIn+"\n--------------------\n");
-           ParseWeather();
+          // ParseWeather();
 /*
             Element tableWth = page.select("table").first();
             Elements dates = tableWth.select("th[colspan=4]"); // даты дней недели для прогноза (их 3)

@@ -11,6 +11,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +31,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -38,6 +41,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(Odessa).title("Marker in Odessa"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Odessa));
 
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                mMap.addMarker(new MarkerOptions().position(latLng).title("New weather place"));
+                Coordinates.latitude = latLng.latitude;
+                Coordinates.longitude = latLng.longitude;
+            }
+        });
+
+        /*
+        CameraPosition cameraPosition =  mMap.getCameraPosition();
+        LatLng currentPosition = cameraPosition.target;
+        Coordinates.latitude = currentPosition.latitude;
+        Coordinates.longitude = currentPosition.longitude;
+
+        */
+/*
         try {
                 Task locationResult =  (LocationServices.getFusedLocationProviderClient(this)).getLastLocation();
                 locationResult.addOnCompleteListener(this, new OnCompleteListener() {
@@ -62,7 +82,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch(SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
-
+*/
 
     }
 }

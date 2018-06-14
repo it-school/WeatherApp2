@@ -59,7 +59,7 @@
                 android:layout_width="175dp"
                 android:layout_height="79dp"
                 android:layout_weight="1"
-                android:onClick="btnClick"
+                android:onClick="btnLoadData"
                 android:text="@string/ButtonText"
                 android:visibility="visible"
                 tools:layout_editor_absoluteX="100dp"
