@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Weather application</string>
     <string name="ButtonText">Load data</string>
+    <string name="BottomText">Current weather in Odessa</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="buttonChooseCity" >Choose city</string>
 </resources>

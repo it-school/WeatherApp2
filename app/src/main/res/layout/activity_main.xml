@@ -13,8 +13,10 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -37,25 +39,46 @@
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Current weather in Odessa"
+            android:text=""
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.813" />
+            app:layout_constraintVertical_bias="0.813"
+            tools:text="@string/BottomText" />
 
-        <Button
-            android:id="@+id/button"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="79dp"
-            android:onClick="btnClick"
-            android:text="@string/ButtonText"
-            android:visibility="visible"
-            tools:layout_editor_absoluteX="100dp"
-            tools:layout_editor_absoluteY="350dp"
-            tools:text="@string/ButtonText" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/buttonLoadData"
+                android:layout_width="175dp"
+                android:layout_height="79dp"
+                android:layout_weight="1"
+                android:onClick="btnClick"
+                android:text="@string/ButtonText"
+                android:visibility="visible"
+                tools:layout_editor_absoluteX="100dp"
+                tools:layout_editor_absoluteY="350dp"
+                tools:text="@string/ButtonText" />
+
+            <Button
+                android:id="@+id/buttonChooseCity"
+                android:layout_width="175dp"
+                android:layout_height="79dp"
+                android:layout_weight="1"
+                android:onClick="btnClickCity"
+                android:text="@string/buttonChooseCity"
+                android:visibility="visible"
+                tools:layout_editor_absoluteX="100dp"
+                tools:layout_editor_absoluteY="350dp"
+                tools:text="@string/buttonChooseCity" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

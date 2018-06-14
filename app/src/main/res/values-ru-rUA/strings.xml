@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">Прогноз погоды</string>
     <string name="ButtonText">Загрузить текущуие данные</string>
+    <string name="BottomText">Текущая погода в Одессе</string>
+    <string name="title_activity_maps">Карта</string>
+    <string name="buttonChooseCity">Город</string>
 </resources>

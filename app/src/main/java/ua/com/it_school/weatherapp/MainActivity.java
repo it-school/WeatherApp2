@@ -1,6 +1,7 @@
 package ua.com.it_school.weatherapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -47,13 +48,14 @@ public class MainActivity extends AppCompatActivity {
     private String FLAG;
     WeatherGetter wg;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         imageView = findViewById(R.id.imageView);
-        button = findViewById(R.id.button);
+        button = findViewById(R.id.buttonLoadData);
         textView = findViewById(R.id.textView);
         jsonIn = "";//"{\"coord\":{\"lon\":30.73,\"lat\":46.48},\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"ясно\",\"icon\":\"01d\"}],\"base\":\"stations\",\"main\":{\"temp\":296.15,\"pressure\":1020,\"humidity\":33,\"temp_min\":296.15,\"temp_max\":296.15},\"visibility\":10000,\"wind\":{\"speed\":3,\"deg\":150},\"clouds\":{\"all\":0},\"dt\":1528381800,\"sys\":{\"type\":1,\"id\":7366,\"message\":0.0021,\"country\":\"UA\",\"sunrise\":1528337103,\"sunset\":1528393643},\"id\":698740,\"name\":\"Odessa\",\"cod\":200}";
         text = "";
@@ -108,31 +110,12 @@ public class MainActivity extends AppCompatActivity {
                 //drawWeather();
             }
         //   ((TextView)findViewById(R.id.textView)).setText(main.toString());
-
-
-
-
-
-        /*
-  String str=null; String input = "данные ";
-  JsonParser parser = new JsonParser();
-  JsonObject mainObject = parser.parse(input).getAsJsonObject();
-  JsonArray pItem = mainObject.getAsJsonArray("p_item");
-  for (JsonElement user : pItem)
-  {
-  JsonObject userObject = user.getAsJsonObject();
-  userObject.get("p_id");
-  str = userObject.get("p_id").toString();
-  }
-         */
-
-    }
+   }
 
     public void btnClick(View view) {
 //        wg.ConnectAndGetData(currWeatherURL);
         ParseWeather();
         drawWeather();
-
     }
 
     public void drawWeather() {
@@ -153,6 +136,16 @@ public class MainActivity extends AppCompatActivity {
 
         } else
             imageView.setImageResource(R.drawable.nodata);
+    }
+
+    public void btnClickCity(View view) {
+        Intent map = new Intent(MainActivity.this, MapsActivity.class);
+        startActivity(map);
+
+//        MapsActivity map = new MapsActivity();
+//       setContentView(R.layout.activity_maps);
+
+
     }
 
 
