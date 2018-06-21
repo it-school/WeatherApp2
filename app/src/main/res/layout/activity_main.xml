@@ -20,27 +20,28 @@
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="384dp">
+            android:layout_height="319dp">
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="match_parent"
-                android:layout_height="379dp"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginEnd="60dp"
+                android:layout_marginStart="60dp"
                 android:contentDescription=""
                 android:scaleType="fitCenter"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </android.support.constraint.ConstraintLayout>
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="128dp"
             android:text=""
-            android:textSize="24sp"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -51,13 +52,14 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/buttonLoadData"
-                android:layout_width="175dp"
-                android:layout_height="79dp"
+                android:layout_width="185dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:onClick="btnLoadData"
                 android:text="@string/ButtonText"
@@ -69,7 +71,7 @@
             <Button
                 android:id="@+id/buttonChooseCity"
                 android:layout_width="175dp"
-                android:layout_height="79dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:onClick="btnClickCity"
                 android:text="@string/buttonChooseCity"

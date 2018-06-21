@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     String currWeatherURL;
     Document page = null;
     private String FLAG;
+    WeatherGetter wg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
      //   currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
         currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?lat="+Coordinates.latitude+"&lon="+Coordinates.longitude+"&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
 // repair static properties
-        WeatherGetter wg;
         wg = new WeatherGetter();
         wg.execute();
     }
@@ -113,17 +113,18 @@ public class MainActivity extends AppCompatActivity {
                 //drawWeather();
             }
             textView.setText(main.toString());
+            drawWeather();
    }
 
     public void btnLoadData(View view) {
 
         currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?lat="+Coordinates.latitude+"&lon="+Coordinates.longitude+"&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
 
-        WeatherGetter wg;
+        if (wg.getStatus() == AsyncTask.Status.RUNNING)
+            wg.cancel(true);
+
         wg = new WeatherGetter();
-        //wg.ConnectAndGetData(currWeatherURL);
         wg.execute();
-        wg.cancel(true);
         ParseWeather();
         drawWeather();
     }
@@ -150,14 +151,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void btnClickCity(View view) {
         Intent map = new Intent(MainActivity.this, MapsActivity.class);
-        startActivity(map);
+//        startActivity(map);
+        startActivityForResult(map, 1);
 
 //        MapsActivity map = new MapsActivity();
 //       setContentView(R.layout.activity_maps);
-
-
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if ((requestCode == 1) && (resultCode == 1)) {
+            Coordinates.longitude = data.getDoubleExtra("longitude", Coordinates.longitude);
+            Coordinates.latitude = data.getDoubleExtra("latitude", Coordinates.latitude);
+
+            textView.setText(Coordinates.longitude + ", " + Coordinates.latitude);
+        }
+    }
 
     class WeatherGetter extends AsyncTask<Void, Void, Void>
     {
@@ -246,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             //textView.setText("\n------------------\n" + jsonIn+"\n--------------------\n");
-          // ParseWeather();
+           ParseWeather();
 /*
             Element tableWth = page.select("table").first();
             Elements dates = tableWth.select("th[colspan=4]"); // даты дней недели для прогноза (их 3)
@@ -270,6 +279,13 @@ public class MainActivity extends AppCompatActivity {
             }
             */
 
+        }
+
+        @Override
+        protected void onCancelled()
+        {
+            super.onCancelled();
+            Log.d("", "Process canceling");
         }
     }
 }

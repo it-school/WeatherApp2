@@ -1,5 +1,6 @@
 package ua.com.it_school.weatherapp;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -45,8 +46,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapLongClick(LatLng latLng) {
                 mMap.addMarker(new MarkerOptions().position(latLng).title("New weather place"));
-                Coordinates.latitude = latLng.latitude;
-                Coordinates.longitude = latLng.longitude;
+                Intent intent = new Intent();
+                intent.putExtra("longitude", latLng.longitude);
+                intent.putExtra("latitude", latLng.latitude);
+                setResult(1, intent);
+                finish();
             }
         });
 

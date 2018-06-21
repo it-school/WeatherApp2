@@ -57,8 +57,8 @@ public class Main {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        return sb.append("City: " + name).append(", date: " + date).append("description: " +  description).append("temp: " + temp).
-                append("\npressure: " + pressure).append("humidity: " + humidity).append("wind: " + speed + "("+ deg+")").toString();
+        return sb.append("City: " + name).append(", \n" + date).append("\n" +  description).append(", " + temp).
+                append("\n" + pressure + "mm").append(",\thumidity: " + humidity).append("\nwind: " + speed + "("+ deg+")").toString();
     }
 
     public String getDescription() {
