@@ -31,7 +31,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-
 public class MainActivity extends AppCompatActivity {
 
     ImageView imageView;
@@ -47,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     Document page = null;
     private String FLAG;
     WeatherGetter wg;
+    String message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         text = "";
         isDataLoaded = false;
         isConnected = true;
+        message = "";
      //   currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
         currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?lat="+Coordinates.latitude+"&lon="+Coordinates.longitude+"&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
 // repair static properties
@@ -228,27 +229,21 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-
             ConnectAndGetData(currWeatherURL);
-            /*
-            url = "http://study.cc.ua";
+            String url = "http://study.cc.ua";
+/*
             try {
-                page = Jsoup.parse(new URL(url), 10000);
-                jsonIn = "| "+page.text()+ " |";
+                  page = Jsoup.connect(url).get();// Connect to the web site
+                  message = page.text() ;           // Get the html document title
+
+                  page = Jsoup.parse(new URL(url), 10000);
+                  message = "| "+page.text()+ " |";
+
+                  textView.setText(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-           //textView.setText(textView.getText()+"In2\n");
-            try {
-                  page = Jsoup.connect(url).get();// Connect to the web site
-                  jsonIn = page.text() ;           // Get the html document title
-
-                    //textView.setText(text);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-//            textView.setText(textView.getText()+"In3\n");
+*/
             return null;
         }
 
