@@ -1,7 +1,6 @@
 package ua.com.it_school.weatherapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,13 +11,12 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,44 +25,34 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
-    ImageView imageView;
     Button button;
-    String jsonIn, text;
     TextView textView;
     WebView webView;
     Resources res;
-    Main main;
-    boolean isDataLoaded;
-    boolean isConnected;
-    String currWeatherURL;
     Document page = null;
     private String FLAG;
-    WeatherGetter wg;
     String message;
+    WebPageGetter wg = null;
+    String url;
+    WeatherInfo [] weatherInfo;
+    final int NUMBER_OF_FORECSTS = 13;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        imageView = findViewById(R.id.imageView);
         button = findViewById(R.id.buttonLoadData);
         textView = findViewById(R.id.textView);
-        jsonIn = "";//"{\"coord\":{\"lon\":30.73,\"lat\":46.48},\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"ясно\",\"icon\":\"01d\"}],\"base\":\"stations\",\"main\":{\"temp\":296.15,\"pressure\":1020,\"humidity\":33,\"temp_min\":296.15,\"temp_max\":296.15},\"visibility\":10000,\"wind\":{\"speed\":3,\"deg\":150},\"clouds\":{\"all\":0},\"dt\":1528381800,\"sys\":{\"type\":1,\"id\":7366,\"message\":0.0021,\"country\":\"UA\",\"sunrise\":1528337103,\"sunset\":1528393643},\"id\":698740,\"name\":\"Odessa\",\"cod\":200}";
-        text = "";
-        isDataLoaded = false;
-        isConnected = true;
         message = "";
-     //   currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
-        currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?lat="+Coordinates.latitude+"&lon="+Coordinates.longitude+"&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
-// repair static properties
-        wg = new WeatherGetter();
+        url = "https://www.gismeteo.ua/weather-odessa-4982/legacy/";
+        weatherInfo = new WeatherInfo[NUMBER_OF_FORECSTS];
+
+
+        wg = new WebPageGetter();
         wg.execute();
     }
 
@@ -72,104 +60,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void ParseWeather() {
-        boolean cont = false;
-        JSONObject json = null;
-        try {
-            json = new JSONObject(jsonIn);
-            cont = true;
-        } catch (JSONException e) {
-            Log.e("log_tag", "Error parsing data " + e.toString());
-        }
-
-        if (cont)
-
-            try {
-                String temp1 = "";
-                JSONObject jsonMain = (JSONObject) json.get("main");
-                double temp = jsonMain.getDouble("temp") - 273.15;
-                int pressure = jsonMain.getInt("pressure");
-                int humidity = jsonMain.getInt("humidity");
-
-                SimpleDateFormat sm = new SimpleDateFormat("d.M.Y H:m");  // https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
-                sm.setTimeZone(TimeZone.getTimeZone("GMT+3"));
-                Date date = new Date(json.getLong("dt") * 1000);
-
-                JSONArray jsonWeather = (JSONArray) json.get("weather");
-                String description = jsonWeather.getJSONObject(0).getString("description");
-
-                JSONObject jsonWind = (JSONObject) json.get("wind");
-                int speed = jsonWind.getInt("speed");
-                int deg = jsonWind.getInt("deg");
-
-                JSONObject jsonClouds = (JSONObject) json.get("clouds");
-                int clouds = jsonClouds.getInt("all");
-
-                String name = json.getString("name");
-
-                main = new Main(temp, pressure, humidity, date, description, speed, deg, clouds, name);
-                isDataLoaded = true;
-            } catch (JSONException e) {
-                e.printStackTrace();
-                //drawWeather();
-            }
-            textView.setText(main.toString());
-            drawWeather();
-   }
-
     public void btnLoadData(View view) {
-
-        currWeatherURL = "http://api.openweathermap.org/data/2.5/weather?lat="+Coordinates.latitude+"&lon="+Coordinates.longitude+"&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
-
-        if (wg.getStatus() == AsyncTask.Status.RUNNING)
-            wg.cancel(true);
-
-        wg = new WeatherGetter();
+        wg = new WebPageGetter();
         wg.execute();
-        ParseWeather();
-        drawWeather();
     }
 
-    public void drawWeather() {
 
-        if (isConnected) {
-            if (main.getClouds() < 5) {
-                imageView.setImageResource(R.drawable.transparent);
-            } else if (main.getClouds() < 25) {
-                imageView.setImageResource(R.drawable.cloud1);
-            } else if (main.getClouds() < 50) {
-                imageView.setImageResource(R.drawable.cloud2);
-            } else if (main.getClouds() < 75) {
-                imageView.setImageResource(R.drawable.cloud3);
-            } else
-                imageView.setImageResource(R.drawable.cloud4);
 
-            imageView.setBackgroundResource(R.drawable.sun);
-
-        } else
-            imageView.setImageResource(R.drawable.nodata);
-    }
-
-    public void btnClickCity(View view) {
-        Intent map = new Intent(MainActivity.this, MapsActivity.class);
-//        startActivity(map);
-        startActivityForResult(map, 1);
-
-//        MapsActivity map = new MapsActivity();
-//       setContentView(R.layout.activity_maps);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if ((requestCode == 1) && (resultCode == 1)) {
-            Coordinates.longitude = data.getDoubleExtra("longitude", Coordinates.longitude);
-            Coordinates.latitude = data.getDoubleExtra("latitude", Coordinates.latitude);
-
-            textView.setText(Coordinates.longitude + ", " + Coordinates.latitude);
-        }
-    }
-
-    class WeatherGetter extends AsyncTask<Void, Void, Void>
+    class WebPageGetter extends AsyncTask<Void, Void, Void>
     {
         private String readAll(Reader rd) throws IOException {
             StringBuilder sb = new StringBuilder();
@@ -182,10 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         public void ConnectAndGetData(String url)
         {
-
-            //String url = "http://api.openweathermap.org/data/2.5/weather?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
-            //String urlForecast = "api.openweathermap.org/data/2.5/forecast?id=698740&appid=dac392b2d2745b3adf08ca26054d78c4&lang=ru";
-
             InputStream is = null;
 
             ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -199,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
                         try {
-                            jsonIn = readAll(rd);
+                            message = readAll(rd);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -215,11 +109,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
-            else
-
-            {
-                isConnected = false;
-            }
         }
 
         @Override
@@ -229,33 +118,83 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            ConnectAndGetData(currWeatherURL);
-            String url = "http://study.cc.ua";
-/*
-            try {
-                  page = Jsoup.connect(url).get();// Connect to the web site
-                  message = page.text() ;           // Get the html document title
+            try
+            {
+                page = Jsoup.connect(url).get();// Connect to the web site
+                message = page.text();           // Get the html document title
 
-                  page = Jsoup.parse(new URL(url), 10000);
-                  message = "| "+page.text()+ " |";
+         //       page = Jsoup.parse(new URL(url), 10000);
+         //       message = "| "+page.text()+ " |";
 
-                  textView.setText(message);
+//                textView.setText(message);
             } catch (IOException e) {
-                e.printStackTrace();
+            e.printStackTrace();
             }
-*/
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            //textView.setText("\n------------------\n" + jsonIn+"\n--------------------\n");
-           ParseWeather();
-/*
-            Element tableWth = page.select("table").first();
-            Elements dates = tableWth.select("th[colspan=4]"); // даты дней недели для прогноза (их 3)
-            Elements rows = tableWth.select("tr");
+           //ParseWeather();
 
+            Element tableWth = page.select("table").first();
+//            textView.setText(tableWth.text());
+            Elements dates = tableWth.select("th[colspan=4]"); // даты дней недели для прогноза (их 3)
+         //   textView.setText(dates.html() + "\n\n" + dates.outerHtml() + "\n\n" + dates.text());
+            int i= 1;
+            for (Element date: dates)
+            {
+                 textView.setText(textView.getText() + "\n" + i++ + ") " + date.text());
+            }
+
+            textView.setText(textView.getText() + "\n\nTemperatures");
+            i = 1;
+            Elements temperatures = tableWth.select("span[class=value m_temp c]");
+            for (Element t : temperatures) {
+             //   textView.setText(/*textView.getText() + "\n" + i + ") " + */t.text().replace("+",""));
+                String tempT = t.text().replace("+","");
+                int temp = Integer.parseInt(tempT);
+                weatherInfo[i-1] = new WeatherInfo();
+
+                weatherInfo[i-1].setTemperature(temp);
+
+                i++;
+                if (i == 13)
+                    break;
+            }
+            textView.setText(textView.getText() + "\n" + weatherInfo[0].getTemperature()+"\n\n------------\n\n");
+
+            // cloudness
+            i = 1;
+            Elements cloudness = tableWth.select("tr[class=persp]");
+            Elements clouds = cloudness.select("img");
+
+            String tempStr="";
+            for (Element c : clouds) {
+                tempStr = c.attr("src");
+            //    textView.setText(textView.getText() + "\n" + i + ") " + tempStr.substring(tempStr.indexOf("old/")+4, tempStr.indexOf("old/")+8));
+                weatherInfo[i-1].setDay(tempStr.charAt(0) == 'd' ? true : false);
+                weatherInfo[i-1].setCloudness(Integer.parseInt(""+tempStr.charAt(3)));
+
+           /*     String tempT = t.text().replace("+","");
+                int temp = Integer.parseInt(tempT);
+                weatherInfo[i-1] = new WeatherInfo();
+
+                weatherInfo[i-1].setTemperature(temp);
+
+*/
+                i++;
+                if (i == 13)
+                    break;
+            }
+
+            textView.setText(textView.getText() + "\n" + weatherInfo[0].getisDay() + " " + weatherInfo[0].getCloudness());
+
+
+
+
+            //            Elements rows = tableWth.select("tr");
+/*
             // извлекаем даты
             date = "";
             for (Element d : dates)
