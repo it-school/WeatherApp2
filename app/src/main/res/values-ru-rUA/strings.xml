@@ -5,4 +5,5 @@
     <string name="BottomText">Поточна погода в Одесі</string>
     <string name="title_activity_maps">Карта</string>
     <string name="buttonChooseCity">Місто</string>
+    <string name="weatherImage">Іконка погоди</string>
 </resources>

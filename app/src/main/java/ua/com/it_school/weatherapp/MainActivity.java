@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     WebPageGetter wg = null;
     String url;
     WeatherInfo [] weatherInfo;
+    ImageView weatherImage;
     final int NUMBER_OF_FORECSTS = 13;
 
     @Override
@@ -47,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
 
         button = findViewById(R.id.buttonLoadData);
         textView = findViewById(R.id.textView);
+        weatherImage = findViewById(R.id.weatherImage);
+        weatherImage.setBackgroundResource(R.drawable.sun);
+        weatherImage.setImageDrawable(null);
         message = "";
         url = "https://www.gismeteo.ua/weather-odessa-4982/legacy/";
         weatherInfo = new WeatherInfo[NUMBER_OF_FORECSTS];
@@ -190,6 +195,31 @@ public class MainActivity extends AppCompatActivity {
 
             textView.setText(textView.getText() + "\n" + weatherInfo[0].getisDay() + " " + weatherInfo[0].getCloudness());
 
+            if (weatherInfo[0].getisDayBoolean())
+                weatherImage.setBackgroundResource(R.drawable.sun);
+            else
+                weatherImage.setBackgroundResource(R.drawable.moon);
+
+
+            switch (weatherInfo[0].getCloudness()) {
+                case 4:
+                    weatherImage.setImageResource(R.drawable.cloud4);
+                    break;
+                case 3:
+                    weatherImage.setImageResource(R.drawable.cloud3);
+                    break;
+                case 2:
+                    weatherImage.setImageResource(R.drawable.cloud2);
+                    break;
+                case 1:
+                    weatherImage.setImageResource(R.drawable.cloud1);
+                    break;
+                default:
+                    weatherImage.setImageDrawable(null);
+                    break;
+
+
+            }
 
 
 

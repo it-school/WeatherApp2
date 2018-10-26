@@ -14,6 +14,10 @@ public final class WeatherInfo {
         return isDay ? "Day" : "Night";
     }
 
+    public boolean getisDayBoolean() {
+        return isDay;
+    }
+
     public void setDay(boolean day) {
         isDay = day;
     }
